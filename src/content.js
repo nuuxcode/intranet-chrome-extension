@@ -45,28 +45,24 @@ if (errorDiv) {
 //KeyNavigation
 let taskNum = '';
 document.addEventListener('keydown', function (event) {
-	event.preventDefault();
 	if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105)) {
+		event.preventDefault();
+		event.stopPropagation();
 		const numericValue = event.keyCode >= 96 ? event.keyCode - 96 : event.keyCode - 48;
-		if (event.ctrlKey && taskNum.length < 2) {
+		if ((event.ctrlKey || event.shiftKey) && taskNum.length < 2) {
 			if ((taskNum.length == 0 && numericValue != 0) || taskNum.length > 0)
 				taskNum += numericValue;
-		} else if (!event.ctrlKey) {
-			taskNum = String(numericValue);
-		}
+		} else if (!event.ctrlKey && !event.shiftKey) taskNum = String(numericValue);
 		let task = document.querySelector('#task-num-' + taskNum);
-		if (!(event.ctrlKey && taskNum.length < 2)) {
-			if (task) {
-				task.scrollIntoView();
-			}
+		if (!((event.ctrlKey || event.shiftKey) && taskNum.length < 2)) {
+			if (task) task.scrollIntoView();
 			taskNum = ''
 		}
 	}
 });
 document.addEventListener('keyup', function (event) {
-	event.preventDefault();
-	if (event.keyCode == 17) taskNum = '';
-	if (((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105)) && !event.ctrlKey) taskNum = '';
+	if (event.keyCode === 17 || event.keyCode === 16) taskNum = '';
+	if (((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105)) && !event.ctrlKey && !event.shiftKey) taskNum = '';
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
